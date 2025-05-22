@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Container, TextField, Checkbox, FormControlLabel, Button, Grid, Typography, Paper } from "@mui/material";
-
+import ErrorDialog from "../ErrorDialog";
 const Add = () => {
     const [formData, setFormData] = useState({
         securityName: "",
@@ -67,22 +67,47 @@ const Add = () => {
         frequency: "",
         dividendType: "",
     });
-
+    const [validationErrors, setValidationErrors] = useState({});
+    const [apiError, setApiError] = useState(null);
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData({
-            ...formData,
-            [name]: type === "checkbox" ? checked : value,
-        });
+        const newValue = type === "checkbox" ? checked : value;
+
+        setFormData((prev) => ({ ...prev, [name]: newValue }));
+
+        // Validation
+        const errors = { ...validationErrors };
+
+        if (
+            (name.includes("Price") || name.includes("Amount") || name.includes("Volume")) &&
+            newValue !== "" && isNaN(newValue)
+        ) {
+            errors[name] = `${name.replace(/([A-Z])/g, " $1").trim()} must be a number`;
+        } else {
+            delete errors[name]; // Clear field error if valid
+        }
+
+        setValidationErrors(errors);
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setApiError(null); // clear previous API errors
 
+        // Required field check
         if (!formData.securityName.trim()) {
-            alert("Security Name is required");
+            setValidationErrors((prev) => ({
+                ...prev,
+                securityName: "Security Name is required",
+            }));
             return;
-          }
+        }
+
+        // Abort if any validation errors exist
+        if (Object.keys(validationErrors).length > 0) {
+            setApiError("Please fix validation errors before submitting.");
+            return;
+        }
 
         const cleanedData = Object.fromEntries(
             Object.entries(formData).filter(([_, value]) => value !== "" && value !== null)
@@ -91,18 +116,18 @@ const Add = () => {
         axios
             .post("https://localhost:7248/sm/EquityEquities", cleanedData)
             .then(() => {
-                alert("Equity added successfully");
+                setApiError("Equity added successfully");
             })
-            .catch((error) => {
-                console.error("Error adding equity:", error);
-                alert("Error adding equity");
-                
+            .catch((err) => {
+                console.error("Error adding equity:", err);
+                setApiError(err.message || "Something went wrong");
             });
     };
 
+
     return (
         <Container maxWidth="lg">
-            <Paper sx={{ padding: 3, marginTop: 5 ,marginBottom: 5}}>
+            <Paper sx={{ padding: 3, marginTop: 5, marginBottom: 5 ,maxHeight: "61vh", overflow:"auto"}}>
                 <Typography variant="h5" gutterBottom>
                     Add a new Equity
                 </Typography>
@@ -123,9 +148,12 @@ const Add = () => {
                                         fullWidth
                                         label={key.replace(/([A-Z])/g, " $1").trim()}
                                         name={key}
-                                        type={key.includes("Date") ? "date" : key.includes("Price") || key.includes("Amount") || key.includes("Volume") ? "number" : "text"}
+                                        type={key.includes("Date") ? "date" :
+                                            key.includes("Price") || key.includes("Amount") || key.includes("Volume") ? "number" : "text"}
                                         value={formData[key]}
                                         onChange={handleChange}
+                                        error={Boolean(validationErrors[key])}
+                                        helperText={validationErrors[key]}
                                         InputLabelProps={key.includes("Date") ? { shrink: true } : {}}
                                     />
                                 )}
@@ -137,6 +165,8 @@ const Add = () => {
                     </Button>
                 </form>
             </Paper>
+            {apiError && <ErrorDialog error={apiError} onClose={() => setApiError(null)} />}
+
         </Container>
     );
 };

@@ -25,11 +25,11 @@ const GetBond = () => {
     const columns = securities.length > 0 ? Object.keys(securities[0]).filter(col => col.toLowerCase() !== "securityid") : [];
 
     return (
-        <Box sx={{ maxWidth: 800, mx: "auto", textAlign: "center", mt: 3, p: 2 }}>
-            <Typography variant="h5" gutterBottom>
+        <Box sx={{ maxWidth: "900vw", mx: "auto", textAlign: "center", mt: 3, p: 2 }}>
+            {/* <Typography variant="h5" gutterBottom>
                 Bonds
             </Typography>
-            <br></br>
+            <br></br> */}
             
 
             {errorMsg && (
@@ -39,7 +39,7 @@ const GetBond = () => {
             )}
 
             {securities.length > 0 ? (
-                <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
+                <TableContainer component={Paper} sx={{ maxHeight: "68vh", width:"100%"}}>
                     <Table stickyHeader>
                         <TableHead>
                             <TableRow>

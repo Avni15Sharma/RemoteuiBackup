@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Typography, Container, Paper} from "@mui/material";
 import axios from "axios";
-
+import ErrorDialog from "../ErrorDialog";
 const DeleteBond = ({ onBondDeleted }) => {
     const [securityName, setSecurityName] = useState("");
     const [error, setError] = useState("");
@@ -9,7 +9,7 @@ const DeleteBond = ({ onBondDeleted }) => {
     const handleDelete = async () => {
         if (!securityName.trim()) {
             setError("Security name is required.");
-            alert("Error deleting bond:", error)
+            // alert("Error deleting bond:", error)
             return;
         }
 
@@ -17,12 +17,14 @@ const DeleteBond = ({ onBondDeleted }) => {
 
         try {
             await axios.delete(`https://localhost:7248/sm/BondBonds/DeleteByName/${securityName}`);
-            alert("Bond deleted successfully");
+            // alert("Bond deleted successfully");
+            setError("Bond deleted successfully");
             setSecurityName(""); 
            
         } catch (error) {
             console.error("Error deleting bond:", error);   
-            alert("Error deleting bond:", error)
+            // alert("Error deleting bond:", error);
+            setError("Error deleting bond:", error);
         }
     };
 
@@ -55,6 +57,7 @@ const DeleteBond = ({ onBondDeleted }) => {
                     Delete
                 </Button>
             </Paper>
+            {error && <ErrorDialog error={error} onClose={() => setError(null)} />}
         </Container>
     );
 };

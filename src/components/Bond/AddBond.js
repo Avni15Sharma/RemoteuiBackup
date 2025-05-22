@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import {  Container,  Typography,  Grid,  TextField,  Checkbox,  FormControlLabel,  Button,  Paper} from "@mui/material";
-
+import ErrorDialog from "../ErrorDialog";
 const AddBond = () => {
   const [formData, setFormData] = useState({
     securityName: "",
@@ -69,38 +69,66 @@ const AddBond = () => {
     lastPrice: "",
   });
 
+  const [validationErrors, setValidationErrors] = useState({});
+      const [apiError, setApiError] = useState(null);
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+    const newValue = type === "checkbox" ? checked : value;
+
+        setFormData((prev) => ({ ...prev, [name]: newValue }));
+
+        // Validation
+        const errors = { ...validationErrors };
+
+        if (
+            (name.includes("Price") || name.includes("Amount") || name.includes("Volume")) &&
+            newValue !== "" && isNaN(newValue)
+        ) {
+            errors[name] = `${name.replace(/([A-Z])/g, " $1").trim()} must be a number`;
+        } else {
+            delete errors[name]; // Clear field error if valid
+        }
+
+        setValidationErrors(errors);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setApiError(null); // clear previous API errors
 
-    if (!formData.securityName.trim()) {
-      alert("Security Name is required");
-      return;
-    }
-  
+        // Required field check
+        if (!formData.securityName.trim()) {
+            setValidationErrors((prev) => ({
+                ...prev,
+                securityName: "Security Name is required",
+            }));
+            return;
+        }
+
+        // Abort if any validation errors exist
+        if (Object.keys(validationErrors).length > 0) {
+            setApiError("Please fix validation errors before submitting.");
+            return;
+        }
+
     const processedData = Object.fromEntries(
       Object.entries(formData).map(([key, value]) => [key, value === "" ? null : value])
     );
 
     axios
       .post("https://localhost:7248/sm/BondBonds", processedData)
-      .then(() => alert("Bond added successfully"))
-      .catch((error) => {
-        console.error("Error adding bond:", error);
-        alert("Error adding bond");
-      });
+      .then(() => {
+        setApiError("Bond added successfully");
+    })
+    .catch((err) => {
+        console.error("Error adding bond:", err);
+        setApiError(err.message || "Something went wrong");
+    });
   };
 
   return (
     <Container maxWidth="lg">
-      <Paper sx={{ padding: 3, marginTop: 5, marginBottom: 5 }}>
+      <Paper sx={{ padding: 3, marginTop: 5, marginBottom: 5 ,maxHeight: "61vh", overflow:"auto"}}>
       <Typography variant="h5" gutterBottom>
         Add a new Bond
       </Typography>
@@ -130,6 +158,8 @@ const AddBond = () => {
                   }
                   value={formData[key]}
                   onChange={handleChange}
+                  error={Boolean(validationErrors[key])}
+                  helperText={validationErrors[key]}
                   InputLabelProps={key.includes("Date") ? { shrink: true } : {}}
                 />
               )}
@@ -141,6 +171,7 @@ const AddBond = () => {
         </Button>
       </form>
       </Paper>
+      {apiError && <ErrorDialog error={apiError} onClose={() => setApiError(null)} />}
     </Container>
   );
 };

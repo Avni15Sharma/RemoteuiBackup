@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { TextField, Checkbox, Button, Typography, Grid, FormControlLabel, Container, Paper } from "@mui/material";
-
+import ErrorDialog from "../ErrorDialog";
 const PutBond = () => {
     const [securityName, setSecurityName] = useState("");
     const [formData, setFormData] = useState({});
     const [isDataLoaded, setIsDataLoaded] = useState(false);
-
+    const [error,setError]= useState(null);
     const handleSearch = () => {
         if (!securityName.trim()) {
-            alert("Please enter a security name.");
+            // alert("Please enter a security name.");
+            setError("Please enter a security name.");
             return;
         }
 
@@ -20,12 +21,14 @@ const PutBond = () => {
                     setFormData({ ...response.data });
                     setIsDataLoaded(true);
                 } else {
-                    alert("Bond not found.");
+                    // alert("Bond not found.");
+                    setError("Bond not found.");
                 }
             })
             .catch((error) => {
                 console.error("Error fetching bond:", error);
-                alert("Error fetching bond data");
+                // alert("Error fetching bond data");
+                setError("Error fetching bond data");
             });
     };
 
@@ -45,18 +48,20 @@ const PutBond = () => {
             headers: { "Content-Type": "application/json" }
         })
         .then(() => {
-            alert("Bond updated successfully!");
+            // alert("Bond updated successfully!");
+            setError("Bond updated successfully!");
         })
         .catch((error) => {
             console.error("Error updating bond:", error);
-            alert("Error updating bond.");
+            // alert("Error updating bond.");
+            setError("Error updating bond.");
         });
     };
     
 
     return (
-        <Container maxWidth="md">
-            <Paper style={{ padding: 20, marginTop: 20 , marginBottom:10}}>
+        <Container maxWidth="lg">
+            <Paper style={{ padding: 20, marginTop: 20 , marginBottom:10, maxHeight: "61vh", overflow:"auto"}}>
             <Typography variant="h5" gutterBottom>
                             Looking for a Bond? Search here!
             </Typography>
@@ -119,6 +124,7 @@ const PutBond = () => {
                     </form>
                 )}
             </Paper>
+            {error && <ErrorDialog error={error} onClose={() => setError(null)} />}
         </Container>
     );
 };

@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { TextField, Checkbox, FormControlLabel, Button, Grid, Container, Paper, Typography } from "@mui/material";
-
+import ErrorDialog from "../ErrorDialog";
 const Put = () => {
     const [securityName, setSecurityName] = useState(""); 
     const [formData, setFormData] = useState({});
     const [isDataLoaded, setIsDataLoaded] = useState(false);
-
+    const [error,setError]= useState(null);
     
     const handleSearch = () => {
         if (!securityName.trim()) {
-            alert("Please enter a security name.");
+            // alert("Please enter a security name.");
+            setError("Please enter a security name.");
             return;
         }
 
@@ -21,12 +22,14 @@ const Put = () => {
                     setFormData({ ...response.data });
                     setIsDataLoaded(true);
                 } else {
-                    alert("Equity not found.");
+                    // alert("Equity not found.");
+                    setError("Equity not found.");
                 }
             })
             .catch((error) => {
                 console.error("Error fetching equity:", error);
-                alert("Equity not found.");
+                // alert("Equity not found.");
+                setError("Equity not found.");
             });
     };
 
@@ -48,17 +51,19 @@ const Put = () => {
             headers: { "Content-Type": "application/json" }
         })
         .then(() => {
-            alert("Equity updated successfully!");
+            // alert("Equity updated successfully!");
+            setError("Equity updated successfully!");
         })
         .catch((error) => {
             console.error("Error updating equity:", error);
-            alert("Error updating equity.");
+            // alert("Error updating equity.");
+            setError("Error updating equity.");
         });
     };
 
     return (
-        <Container maxWidth="md">
-            <Paper style={{ padding: 20, marginTop: 20 , marginBottom:10}}>
+        <Container maxWidth="lg">
+            <Paper style={{ padding: 20, marginTop: 20 , marginBottom:10, maxHeight: "61vh", overflow:"auto"}}>
                 <Typography variant="h5" gutterBottom>
                                 Looking for an Equity? Search here!
                 </Typography>
@@ -124,6 +129,7 @@ const Put = () => {
                     </form>
                 )}
             </Paper>
+            {error && <ErrorDialog error={error} onClose={() => setError(null)} />}
         </Container>
     );
 };

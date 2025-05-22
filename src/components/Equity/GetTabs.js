@@ -39,7 +39,7 @@ const GetTabs = () => {
         },[]);
 
     return (
-        <Box sx={{ maxWidth: 800, mx: "auto", mt: 3, p: 3, textAlign: "center", border: "1px solid #ddd", borderRadius: 2 }}>
+        <Box sx={{ maxWidth: "900vw", mx: "auto", mt: 3, p: 3, textAlign: "center", border: "1px solid #ddd", borderRadius: 2 }}>
             <Typography variant="h5" gutterBottom>
                 Tab-Wise Equity Details
             </Typography>

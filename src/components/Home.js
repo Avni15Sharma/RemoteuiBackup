@@ -86,7 +86,7 @@ const Home = () => {
             <Grid container spacing={2}>
          
                 <Grid item xs={12} sm={3}>
-                    <Paper elevation={3} sx={{ p: 2, minHeight: "300px" }}>
+                    <Paper elevation={3} sx={{ p: 2, minHeight: "710px", display:"flex", justifyContent:"center", backgroundColor:"#ffb74d"}} >
                         {selectedTab !== "bond" && <EquitySidebar onSelect={setSelectedOption} />}
                         {selectedTab === "bond" && <BondSidebar onSelect={setSelectedOption} />}
                     </Paper>
@@ -94,7 +94,7 @@ const Home = () => {
 
            
                 <Grid item xs={12} sm={9}>
-                    <Paper elevation={3} sx={{ p: 2, minHeight: "300px" }}>
+                    <Paper elevation={3} sx={{ p: 2, minHeight: "710px", backgroundColor: "#FFF9C4" }}>
                         {renderContent()} 
                     </Paper>
                 </Grid>

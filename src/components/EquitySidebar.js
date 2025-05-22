@@ -6,11 +6,11 @@ const EquitySidebar = ({ onSelect }) => {
     const theme=useTheme();
     return (
         <div >
-            <br></br>
+            <br></br><br></br>
             <Typography variant="h6" gutterBottom>
                 Equity Panel
             </Typography>
-            <Stack spacing={1} >
+            <Stack spacing={1} minWidth={"20vw"}>
                 <Button variant="contained" sx={{ backgroundColor: "#1B2A49" }} fullWidth onClick={() => onSelect("add")}>
                     Create
                 </Button>

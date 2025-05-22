@@ -27,7 +27,7 @@ const GetEquityByName = () => {
     const columns = securityData ? Object.keys(securityData).filter(col => col.toLowerCase() !== "securityid") : [];
 
     return (
-        <Box sx={{ maxWidth: 800, mx: "auto", textAlign: "center", mt: 3, p: 3, border: "1px solid #ddd", borderRadius: 2 }}>
+        <Box sx={{ maxWidth: "900vw", mx: "auto", textAlign: "center", mt: 3, p: 3, border: "1px solid #ddd", borderRadius: 2 }}>
             <Typography variant="h5" gutterBottom>
                 Looking for an Equity? Search here!
             </Typography>
